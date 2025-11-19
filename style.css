@@ -1,0 +1,106 @@
+/* style.css - Routine+ MVP */
+:root{
+  --bg: #001f3f;
+  --bg2: #002d5c;
+  --card: #001a33;
+  --text: #f4f4f4;
+  --accent: #87CEEB;
+  --border: #004d99;
+}
+
+*{box-sizing:border-box}
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    padding: 25px;
+    background: #003366;
+    border-bottom: 3px solid var(--accent);
+}
+
+header h1{ margin: 0; font-size: 2rem; }
+header p{ margin: 6px 0 0; color: var(--text); opacity: .9; }
+
+section {
+    padding: 20px;
+    margin: 20px auto;
+    background: var(--bg2);
+    width: 92%;
+    max-width: 760px;
+    border-radius: 10px;
+    border-left: 5px solid var(--accent);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    transition: transform .18s ease;
+}
+
+section:hover{ transform: translateY(-4px); }
+
+h2 {
+    color: var(--accent);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 6px;
+    margin-top: 0;
+}
+
+#task-form input,
+#task-form select,
+#task-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #f7f9ff08;
+    color: var(--text);
+}
+
+#task-form button {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#task-list { padding: 0; margin: 0; list-style: none; }
+
+#task-list li {
+    background: var(--card);
+    padding: 12px;
+    margin-bottom: 12px;
+    border-left: 6px solid var(--accent);
+    border-radius: 6px;
+    position: relative;
+}
+
+.task-meta { font-size: 0.9rem; color: #cfe6ffcc; margin-top: 6px; }
+.task-actions{ margin-top: 10px; display:flex; gap:8px; }
+
+.small-btn{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.small-btn:hover{ opacity: 0.9; transform: translateY(-2px); }
+
+footer { text-align:center; padding: 18px 0; color: var(--text); margin-top: 30px;}
+
+/* responsividade */
+@media (max-width:600px){
+  header h1{ font-size: 1.4rem; }
+  section{ width: 96%; padding: 16px; }
+}
