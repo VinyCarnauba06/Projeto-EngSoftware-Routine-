@@ -1,45 +1,46 @@
-// server.js — Routine+ backend corrigido
+require('dotenv').config();
 
 const express = require('express');
 const fetch = require('node-fetch');
 const cors = require('cors');
 const { MongoClient, ObjectId } = require('mongodb');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.OPENWEATHER_API_KEY;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
+const MONGO_URI = process.env.MONGO_URI;
 
-// ---------------------------
-// MIDDLEWARES
-// ---------------------------
 app.use(express.json());
-app.use(cors()); // ESSENCIAL PARA FUNCIONAR NO FRONTEND
-console.log("✔️ CORS habilitado");
+app.use(cors());
 
-// ---------------------------
-// MONGO DB
-// ---------------------------
 let db;
 
+// ---------------------------
+// MONGO DB (CORRIGIDO) ✔️
+// ---------------------------
 async function connectDB() {
     try {
-        const client = new MongoClient(MONGO_URI);
+        const client = new MongoClient(MONGO_URI, {
+            tls: true,
+            tlsAllowInvalidCertificates: false,
+            retryWrites: true,
+            serverSelectionTimeoutMS: 5000
+        });
+
         await client.connect();
         db = client.db("routineplusdb");
-        console.log("✔️ MongoDB conectado");
+        console.log("✔️ MongoDB conectado com sucesso ao Atlas");
     } catch (err) {
-        console.error("❌ Erro ao conectar MongoDB:", err);
+        console.error("❌ Erro ao conectar MongoDB:", err.message);
     }
 }
 connectDB();
 
 // ---------------------------
-// AUTENTICAÇÃO (DESATIVADA - MODO DEV)
+// AUTENTICAÇÃO FAKE (DEV)
 // ---------------------------
 function fakeAuth(req, res, next) {
-    req.user = { uid: "mock-user-123" }; // simula usuário
+    req.user = { uid: "mock-user-123" };
     next();
 }
 app.use('/api/tasks', fakeAuth);
@@ -47,8 +48,6 @@ app.use('/api/tasks', fakeAuth);
 // ---------------------------
 // ROTAS DE CLIMA
 // ---------------------------
-
-// 🔹 Clima atual (funciona com chave gratuita)
 app.get('/api/weather', async (req, res) => {
     const city = req.query.city;
     if (!city) return res.status(400).json({ error: "city required" });
@@ -66,7 +65,6 @@ app.get('/api/weather', async (req, res) => {
     }
 });
 
-// 🔹 Previsão (usando `/forecast`, funciona com chave grátis)
 app.get('/api/weather/forecast', async (req, res) => {
     const city = req.query.city;
     if (!city) return res.status(400).json({ error: "city required" });
@@ -86,10 +84,10 @@ app.get('/api/weather/forecast', async (req, res) => {
 // ---------------------------
 // ROTAS DE TAREFAS (CRUD)
 // ---------------------------
-
-// listar tarefas
 app.get('/api/tasks', async (req, res) => {
     try {
+        if (!db) throw new Error("Database not initialized");
+
         const tasks = await db.collection("tasks")
             .find({ userId: req.user.uid })
             .toArray();
@@ -100,7 +98,6 @@ app.get('/api/tasks', async (req, res) => {
     }
 });
 
-// criar tarefa
 app.post('/api/tasks', async (req, res) => {
     const task = req.body;
 
@@ -108,6 +105,8 @@ app.post('/api/tasks', async (req, res) => {
         return res.status(400).json({ error: "title required" });
 
     try {
+        if (!db) throw new Error("Database not initialized");
+
         const newTask = {
             ...task,
             userId: req.user.uid,
@@ -127,11 +126,12 @@ app.post('/api/tasks', async (req, res) => {
     }
 });
 
-// atualizar tarefa (concluir)
 app.patch('/api/tasks/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
+        if (!db) throw new Error("Database not initialized");
+
         const result = await db.collection("tasks").updateOne(
             { _id: new ObjectId(id), userId: req.user.uid },
             { $set: { isCompleted: true } }
@@ -147,11 +147,12 @@ app.patch('/api/tasks/:id', async (req, res) => {
     }
 });
 
-// excluir tarefa
 app.delete('/api/tasks/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
+        if (!db) throw new Error("Database not initialized");
+
         const result = await db.collection("tasks").deleteOne({
             _id: new ObjectId(id),
             userId: req.user.uid
@@ -167,9 +168,6 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
-// ---------------------------
-// INICIAR SERVIDOR
-// ---------------------------
 app.listen(PORT, () => {
     console.log(`🚀 Routine+ backend rodando em http://localhost:${PORT}`);
 });
