@@ -1,11 +1,11 @@
-/* style.css - Routine+ MVP */
+/* style.css - Routine+ MVP - TEMA SAÚDE */
 :root{
-  --bg: #001f3f;
-  --bg2: #002d5c;
-  --card: #001a33;
-  --text: #f4f4f4;
-  --accent: #87CEEB;
-  --border: #004d99;
+  --bg: #f8f9fa;
+  --bg2: #ffffff;
+  --card: #e9ecef;
+  --text: #212529;
+  --accent: #40c057;
+  --border: #69db7c;
 }
 
 *{box-sizing:border-box}
@@ -21,12 +21,13 @@ body {
 header {
     text-align: center;
     padding: 25px;
-    background: #003366;
+    background: var(--bg2);
     border-bottom: 3px solid var(--accent);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 header h1{ margin: 0; font-size: 2rem; }
-header p{ margin: 6px 0 0; color: var(--text); opacity: .9; }
+header p{ margin: 6px 0 0; color: var(--text); opacity: .7; }
 
 section {
     padding: 20px;
@@ -36,7 +37,7 @@ section {
     max-width: 760px;
     border-radius: 10px;
     border-left: 5px solid var(--accent);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
     transition: transform .18s ease;
 }
 
@@ -51,25 +52,63 @@ h2 {
 
 #task-form input,
 #task-form select,
-#task-form textarea {
+#task-form textarea,
+#weather-controls input {
     width: 100%;
     margin-bottom: 10px;
     padding: 10px;
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 6px;
-    background: #f7f9ff08;
+    background: var(--card);
     color: var(--text);
 }
 
 #task-form button {
     background: var(--accent);
-    color: #000;
+    color: #fff;
     border: none;
     padding: 12px;
     width: 100%;
     font-weight: bold;
     border-radius: 6px;
     cursor: pointer;
+    transition: background .15s ease, transform .08s ease;
+}
+
+#task-form button:hover,
+#weather-controls button:hover {
+    background: #349c47;
+    transform: translateY(-1px);
+}
+
+#weather-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+#weather-controls input {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+#weather-controls button {
+    padding: 10px 15px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    width: auto;
+}
+
+#weather-info {
+    font-size: 1.1rem;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    background: var(--card);
 }
 
 #task-list { padding: 0; margin: 0; list-style: none; }
@@ -81,26 +120,45 @@ h2 {
     border-left: 6px solid var(--accent);
     border-radius: 6px;
     position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-.task-meta { font-size: 0.9rem; color: #cfe6ffcc; margin-top: 6px; }
+.task-meta { font-size: 0.9rem; color: #6c757d; margin-top: 6px; }
 .task-actions{ margin-top: 10px; display:flex; gap:8px; }
 
 .small-btn{
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg2);
+  border: 1px solid #ccc;
   padding: 6px 10px;
   border-radius: 6px;
   color: var(--text);
   cursor: pointer;
+  transition: transform .15s ease;
 }
 
-.small-btn:hover{ opacity: 0.9; transform: translateY(-2px); }
+.small-btn:hover{ opacity: 1; transform: translateY(-1px); background: #f0f0f0; }
 
-footer { text-align:center; padding: 18px 0; color: var(--text); margin-top: 30px;}
+footer { text-align:center; padding: 18px 0; color: var(--text); opacity: 0.6; margin-top: 30px;}
+
+/* helpers */
+.hidden { display: none; }
+.kicker { font-size: .9rem; color: #6c757d; }
 
 /* responsividade */
 @media (max-width:600px){
   header h1{ font-size: 1.4rem; }
   section{ width: 96%; padding: 16px; }
+  #weather-controls{ flex-direction: column; }
+  #weather-controls button { width: 100%; }
+}
+
+
+/* Dark mode */
+body.dark {
+  --bg: #0f1720;
+  --bg2: #0b1220;
+  --card: #111827;
+  --text: #e6eef6;
+  --accent: #3ddc84;
+  --border: #2ea86e;
 }

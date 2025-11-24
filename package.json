@@ -1,0 +1,24 @@
+{
+  "name": "routineplus-backend",
+  "version": "1.0.0",
+  "description": "Backend for Routine+ (Express, MongoDB, Firebase Admin)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7",
+    "firebase-admin": "^11.10.0",
+    "mongodb": "^5.7.0",
+    "node-cron": "^3.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

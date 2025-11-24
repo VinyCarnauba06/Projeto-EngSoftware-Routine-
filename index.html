@@ -1,51 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Routine+ — MVP</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Routine+ — MVP Full-Stack (Tema Saúde)</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+  <header>
+    <h1>Routine+</h1>
+    <p>Organize suas tarefas com alertas climáticos inteligentes</p>
+    <div style="text-align:center; margin-top:8px;">
+    <button id="toggle-theme" class="small-btn" style="display:inline-block;">Alternar Dark Mode</button>
+  </div>
+</header>
 
-    <header>
-        <h1>Routine+</h1>
-        <p>Organize suas tarefas com alertas climáticos inteligentes</p>
-    </header>
+  <section id="weather">
+    <h2>Clima de Hoje</h2>
+    <div id="weather-controls">
+      <input type="text" id="city-input" placeholder="Digite sua cidade (ex: São Paulo)" value="Maceio" />
+      <button id="load-weather-btn">Atualizar Clima</button>
+    </div>
+    <div id="weather-info">Carregando clima...</div>
+  </section>
 
-    <section id="weather">
-        <h2>Clima de Hoje</h2>
-        <div id="weather-info">Carregando clima...</div>
-    </section>
+  <section id="task-form-section">
+    <h2>Criar Tarefa</h2>
+    <form id="task-form">
+      <input type="text" id="title" placeholder="Título da tarefa" required />
+      <input type="datetime-local" id="date" />
+      <select id="category">
+        <option value="Casa">Casa</option>
+        <option value="Trabalho">Trabalho</option>
+        <option value="Estudos">Estudos</option>
+        <option value="Ao ar livre">Ao ar livre</option>
+      </select>
+      <textarea id="description" placeholder="Descrição (opcional)"></textarea>
+      <button type="submit">Adicionar Tarefa</button>
+    </form>
+    <div style="margin-top:8px;"><button id="register-token-btn" class="small-btn">Registrar token FCM (simulado)</button></div>
+  </section>
 
-    <section id="task-form-section">
-        <h2>Criar Tarefa</h2>
-        <form id="task-form">
-            <input type="text" id="title" placeholder="Título da tarefa" required />
-            <input type="datetime-local" id="date" required />
+  <section id="task-list-section">
+    <h2>Minhas Tarefas</h2>
+    <ul id="task-list"></ul>
+  </section>
 
-            <select id="category">
-                <option value="Casa">Casa</option>
-                <option value="Trabalho">Trabalho</option>
-                <option value="Estudos">Estudos</option>
-                <option value="Ao ar livre">Ao ar livre</option>
-            </select>
+  <footer>
+    Routine+ — Desenvolvido como MVP Full-Stack para portfólio
+  </footer>
 
-            <textarea id="description" placeholder="Descrição (opcional)"></textarea>
-
-            <button type="submit">Adicionar Tarefa</button>
-        </form>
-    </section>
-
-    <section id="task-list-section">
-        <h2>Minhas Tarefas</h2>
-        <ul id="task-list"></ul>
-    </section>
-
-    <footer>
-        Routine+ — Desenvolvido como MVP para portfólio
-    </footer>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
