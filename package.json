@@ -1,19 +1,25 @@
 {
-  "name": "routineplus-frontend-revamp",
+  "name": "routineplus-backend",
   "version": "1.0.0",
-  "private": true,
+  "description": "Backend for Routine+ (Express, MongoDB, Firebase Admin)",
+  "main": "server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "firebase": "^9.23.0",
-    "react-router-dom": "^6.14.1"
+    "cors": "^2.8.5", 
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7",
+    "firebase-admin": "^11.10.0",
+    "mongodb": "^5.7.0",
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }
