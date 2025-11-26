@@ -16,16 +16,18 @@ if (themeToggleBtn) {
 applyTheme();
 
 
-// Lógica do Pop-up do Clima
 const weatherPopup = document.getElementById('weather-popup');
 const toggleWeatherBtn = document.getElementById('toggle-weather-btn');
 const closeWeatherBtn = document.getElementById('close-weather-btn');
 
 if (toggleWeatherBtn) {
     toggleWeatherBtn.addEventListener('click', () => {
+        
         weatherPopup.classList.toggle('hidden'); 
+        // ✅ CORREÇÃO: Adiciona a classe no-scroll para travar o body
         document.body.classList.toggle('no-scroll');
         
+        // Carrega o clima apenas se o painel estiver VISÍVEL
         if (!weatherPopup.classList.contains('hidden')) {
             loadWeather(currentCity); 
         }
@@ -34,11 +36,14 @@ if (toggleWeatherBtn) {
 
 if (closeWeatherBtn) {
     closeWeatherBtn.addEventListener('click', () => {
+        // Esconde o painel
         weatherPopup.classList.add('hidden'); 
+        // ✅ CORREÇÃO: Remove a classe no-scroll ao fechar
         document.body.classList.remove('no-scroll');
     });
 }
 
+// Garante que o painel está escondido ao carregar a página
 if (weatherPopup) {
     weatherPopup.classList.add('hidden');
 }
@@ -57,25 +62,29 @@ function getAuthHeaders() {
 }
 
 // ======================================================
-//  ✅ LÓGICA DE AUTENTICAÇÃO
+//  LÓGICA DE AUTENTICAÇÃO
 // ======================================================
 
-const authSection = document.getElementById('auth-section');
+const registerView = document.getElementById('register-view');
+const loginView = document.getElementById('login-view');
 const mainContainer = document.querySelector('.main-container');
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
-const toggleRegisterBtn = document.getElementById('toggle-register-btn');
 const logoutBtn = document.getElementById('logout-btn');
+const showLoginLink = document.getElementById('show-login-link');
+const showRegisterLink = document.getElementById('show-register-link');
 
 
 function updateUI(isLoggedIn) {
     if (isLoggedIn) {
-        authSection.classList.add('hidden');
+        registerView.classList.add('hidden');
+        loginView.classList.add('hidden');
         mainContainer.classList.remove('hidden');
         logoutBtn.classList.remove('hidden');
         fetchAndRenderTasks();
     } else {
-        authSection.classList.remove('hidden');
+        registerView.classList.remove('hidden');
+        loginView.classList.add('hidden');
         mainContainer.classList.add('hidden');
         logoutBtn.classList.add('hidden');
     }
@@ -92,10 +101,11 @@ async function handleAuth(url, email, password) {
         const data = await res.json();
 
         if (!res.ok) {
-            return alert(`Falha na autenticação: ${data.error || res.statusText}`);
+            alert(`Erro de conexão com o servidor de autenticação.`); 
+            console.error(`Falha na autenticação: ${data.error || res.statusText}`);
+            return;
         }
 
-        // Armazena o token e atualiza o estado
         AUTH_TOKEN = data.token;
         localStorage.setItem('jwt_token', data.token);
         updateUI(true);
@@ -106,13 +116,20 @@ async function handleAuth(url, email, password) {
     }
 }
 
-// Troca entre Login e Registro
-if (toggleRegisterBtn) {
-    toggleRegisterBtn.addEventListener('click', () => {
-        loginForm.classList.toggle('hidden');
-        registerForm.classList.toggle('hidden');
-        toggleRegisterBtn.textContent = registerForm.classList.contains('hidden') ? 
-            "Ainda não tem conta? Clique para Criar Conta" : "Já tem conta? Clique para Entrar";
+// Lógica de Navegação entre Login/Registro
+if (showLoginLink) {
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+    });
+}
+
+if (showRegisterLink) {
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerView.classList.remove('hidden');
+        loginView.classList.add('hidden');
     });
 }
 
@@ -151,10 +168,7 @@ if (logoutBtn) {
 updateUI(AUTH_TOKEN !== null);
 
 
-// ======================================================
-//  INÍCIO DO CÓDIGO ANTERIOR (MANTIDO)
-// ======================================================
-
+// CÓDIGO ANTERIOR ABAIXO:
 
 const cityInput = document.getElementById('city-input');
 const loadWeatherBtn = document.getElementById('load-weather-btn');
@@ -206,10 +220,8 @@ async function fetchAndRenderTasks(){
     const list = document.getElementById('task-list');
     list.innerHTML = '<li>Carregando tarefas...</li>';
     try {
-        // Usa o token real armazenado
         const res = await fetch(`${BASE_URL}/api/tasks`, { headers: getAuthHeaders() });
         
-        // Se a resposta for 401 (Não Autorizado), faz o logout
         if (res.status === 401) {
              updateUI(false);
              list.innerHTML = '<li>Sessão expirada. Faça login novamente.</li>';
@@ -348,4 +360,5 @@ async function checkWeatherAlert(task) {
 
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]); }); }
 
-// Código de inicialização: a chamada fetchAndRenderTasks é feita dentro de updateUI
+// inicializa UI
+fetchAndRenderTasks();
