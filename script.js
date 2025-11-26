@@ -15,19 +15,17 @@ if (themeToggleBtn) {
 }
 applyTheme();
 
-
+// Lógica do Pop-up do Clima
 const weatherPopup = document.getElementById('weather-popup');
 const toggleWeatherBtn = document.getElementById('toggle-weather-btn');
 const closeWeatherBtn = document.getElementById('close-weather-btn');
 
+// Lógica de Trava de Scroll (Fix para Mobile) e Toggle
 if (toggleWeatherBtn) {
     toggleWeatherBtn.addEventListener('click', () => {
-        
         weatherPopup.classList.toggle('hidden'); 
-        // ✅ CORREÇÃO: Adiciona a classe no-scroll para travar o body
         document.body.classList.toggle('no-scroll');
         
-        // Carrega o clima apenas se o painel estiver VISÍVEL
         if (!weatherPopup.classList.contains('hidden')) {
             loadWeather(currentCity); 
         }
@@ -36,139 +34,27 @@ if (toggleWeatherBtn) {
 
 if (closeWeatherBtn) {
     closeWeatherBtn.addEventListener('click', () => {
-        // Esconde o painel
         weatherPopup.classList.add('hidden'); 
-        // ✅ CORREÇÃO: Remove a classe no-scroll ao fechar
         document.body.classList.remove('no-scroll');
     });
 }
 
-// Garante que o painel está escondido ao carregar a página
+// Esconde o painel ao carregar
 if (weatherPopup) {
     weatherPopup.classList.add('hidden');
 }
 
 
 // script.js - Routine+ frontend
-const BASE_URL = 'https://routine-plus.onrender.com';
-let AUTH_TOKEN = localStorage.getItem('jwt_token') || null;
-
+const BASE_URL = 'https://routine-plus.onrender.com'; // URL do Render
+let MOCK_ID_TOKEN = "TEST_TOKEN_XYZ_MOCK_USER_123"; // Token mock para fakeAuth
 
 function getAuthHeaders() {
     return {
-        'Authorization': `Bearer ${AUTH_TOKEN}`,
+        'Authorization': `Bearer ${MOCK_ID_TOKEN}`,
         'Content-Type': 'application/json'
     };
 }
-
-// ======================================================
-//  LÓGICA DE AUTENTICAÇÃO
-// ======================================================
-
-const registerView = document.getElementById('register-view');
-const loginView = document.getElementById('login-view');
-const mainContainer = document.querySelector('.main-container');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-const logoutBtn = document.getElementById('logout-btn');
-const showLoginLink = document.getElementById('show-login-link');
-const showRegisterLink = document.getElementById('show-register-link');
-
-
-function updateUI(isLoggedIn) {
-    if (isLoggedIn) {
-        registerView.classList.add('hidden');
-        loginView.classList.add('hidden');
-        mainContainer.classList.remove('hidden');
-        logoutBtn.classList.remove('hidden');
-        fetchAndRenderTasks();
-    } else {
-        registerView.classList.remove('hidden');
-        loginView.classList.add('hidden');
-        mainContainer.classList.add('hidden');
-        logoutBtn.classList.add('hidden');
-    }
-}
-
-async function handleAuth(url, email, password) {
-    try {
-        const res = await fetch(`${BASE_URL}${url}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            alert(`Erro de conexão com o servidor de autenticação.`); 
-            console.error(`Falha na autenticação: ${data.error || res.statusText}`);
-            return;
-        }
-
-        AUTH_TOKEN = data.token;
-        localStorage.setItem('jwt_token', data.token);
-        updateUI(true);
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro de conexão com o servidor de autenticação.');
-    }
-}
-
-// Lógica de Navegação entre Login/Registro
-if (showLoginLink) {
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerView.classList.add('hidden');
-        loginView.classList.remove('hidden');
-    });
-}
-
-if (showRegisterLink) {
-    showRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerView.classList.remove('hidden');
-        loginView.classList.add('hidden');
-    });
-}
-
-// Submissão do Login
-if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-        handleAuth('/api/auth/login', email, password);
-    });
-}
-
-// Submissão do Registro
-if (registerForm) {
-    registerForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('register-email').value.trim();
-        const password = document.getElementById('register-password').value.trim();
-        handleAuth('/api/auth/register', email, password);
-    });
-}
-
-// Logout
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-        AUTH_TOKEN = null;
-        localStorage.removeItem('jwt_token');
-        updateUI(false);
-        alert('Logout realizado com sucesso.');
-    });
-}
-
-
-// Inicialização: Verifica se já existe um token
-updateUI(AUTH_TOKEN !== null);
-
-
-// CÓDIGO ANTERIOR ABAIXO:
 
 const cityInput = document.getElementById('city-input');
 const loadWeatherBtn = document.getElementById('load-weather-btn');
@@ -221,13 +107,10 @@ async function fetchAndRenderTasks(){
     list.innerHTML = '<li>Carregando tarefas...</li>';
     try {
         const res = await fetch(`${BASE_URL}/api/tasks`, { headers: getAuthHeaders() });
-        
         if (res.status === 401) {
-             updateUI(false);
-             list.innerHTML = '<li>Sessão expirada. Faça login novamente.</li>';
+             list.innerHTML = '<li>Erro: Não autorizado. Simule o Login.</li>';
              return;
         }
-
         tasks = await res.json();
         list.innerHTML = '';
         if (tasks.length === 0) {
@@ -322,43 +205,24 @@ async function deleteTask(taskId){
     }
 }
 
-// LÓGICA DO ALERTA CLIMÁTICO REVISADA
 async function checkWeatherAlert(task) {
     try {
         const res = await fetch(`${BASE_URL}/api/weather/forecast?city=${encodeURIComponent(currentCity)}`);
-        if (!res.ok) throw new Error("Forecast API error");
+        if (!res.ok) return;
         const data = await res.json();
-        
-        const now = new Date().getTime();
-        const next24Hours = now + (1000 * 60 * 60 * 24);
-        
-        let shouldAlert = false;
-        
-        if (data && data.list) {
-            for (const forecast of data.list) {
-                const forecastTime = forecast.dt * 1000;
-                
-                if (forecastTime > now && forecastTime <= next24Hours) {
-                     const weatherDesc = forecast.weather[0].main.toLowerCase();
-                     
-                     if (weatherDesc.includes('rain') || weatherDesc.includes('storm') || weatherDesc.includes('drizzle')) {
-                        shouldAlert = true;
-                        break;
-                     }
-                }
+        // Lógica de verificação de chuva para o alerta
+        const main = (data.hourly?.[0]?.weather?.[0]?.main || data.current?.weather?.[0]?.main || '').toLowerCase();
+        if (main.includes('rain') || main.includes('storm') || main.includes('drizzle')) {
+            const taskDate = task.date ? new Date(task.date) : null;
+            if (!taskDate || (Math.abs(taskDate - new Date()) < 1000 * 60 * 60 * 24)) {
+                alert(`⚠️ Atenção! Pode chover na hora da tarefa "${task.title}" em ${data.name}!`);
             }
         }
-
-        if (shouldAlert) {
-            alert(`⚠️ ALERTA: Pode chover ou ter tempestade/garoa em ${data.city.name} nas próximas 24 horas. Sua tarefa "${task.title}" é "Ao ar livre"!`);
-        }
-
-    } catch(err) {
-        console.error("Erro ao verificar alerta climático:", err); 
-    }
+    } catch(err){ console.error(err); }
 }
 
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]); }); }
 
 // inicializa UI
 fetchAndRenderTasks();
+loadWeather();

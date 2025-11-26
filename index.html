@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Routine+</title>
-  <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <header>
@@ -28,22 +28,9 @@
     </section>
 </aside>
 
-<section id="auth-section" style="max-width: 400px;">
-    <h2>Entrar / Criar Conta</h2>
-    <form id="login-form">
-        <input type="email" id="login-email" placeholder="Seu email" required />
-        <input type="password" id="login-password" placeholder="Sua senha" required />
-        <button type="submit">Entrar</button>
-    </form>
-    <p style="text-align:center; margin-top:15px; cursor:pointer;" id="toggle-register-btn">Ainda não tem conta? Clique para **Criar Conta**</p>
-    <form id="register-form" class="hidden">
-        <input type="email" id="register-email" placeholder="Seu email" required />
-        <input type="password" id="register-password" placeholder="Sua senha" required />
-        <button type="submit">Criar Conta</button>
-    </form>
-</section>
+<div class="main-container">
 
-  <div class="main-container hidden">     <aside id="sidebar">
+    <aside id="sidebar">
       <h2>Filtros</h2>
       <nav id="filter-nav">
         <button class="filter-btn active" data-filter="all">Todas as Tarefas</button>
@@ -79,9 +66,6 @@
     </main>
 
   </div>
-    <div style="text-align:center; margin-top:20px; margin-bottom: 20px;">
-        <button id="logout-btn" class="small-btn hidden">Sair (Logout)</button>
-    </div>
 
   <footer>
     Routine+ — Desenvolvido como MVP Full-Stack para portfólio
