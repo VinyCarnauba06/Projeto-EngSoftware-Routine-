@@ -16,18 +16,16 @@ if (themeToggleBtn) {
 applyTheme();
 
 
+// Lógica do Pop-up do Clima
 const weatherPopup = document.getElementById('weather-popup');
 const toggleWeatherBtn = document.getElementById('toggle-weather-btn');
 const closeWeatherBtn = document.getElementById('close-weather-btn');
 
 if (toggleWeatherBtn) {
     toggleWeatherBtn.addEventListener('click', () => {
-        
         weatherPopup.classList.toggle('hidden'); 
-        // ✅ CORREÇÃO AQUI: Adiciona/Remove a classe no-scroll
         document.body.classList.toggle('no-scroll');
         
-        // Carrega o clima apenas se o painel estiver VISÍVEL
         if (!weatherPopup.classList.contains('hidden')) {
             loadWeather(currentCity); 
         }
@@ -36,29 +34,127 @@ if (toggleWeatherBtn) {
 
 if (closeWeatherBtn) {
     closeWeatherBtn.addEventListener('click', () => {
-        // Esconde o painel
         weatherPopup.classList.add('hidden'); 
-        // ✅ CORREÇÃO AQUI: Remove a classe no-scroll ao fechar
         document.body.classList.remove('no-scroll');
     });
 }
 
-// Garante que o painel está escondido ao carregar a página
 if (weatherPopup) {
     weatherPopup.classList.add('hidden');
 }
 
 
 // script.js - Routine+ frontend
-const BASE_URL = 'https://routine-plus.onrender.com'; // URL do Render
-let MOCK_ID_TOKEN = "TEST_TOKEN_XYZ_MOCK_USER_123";
+const BASE_URL = 'https://routine-plus.onrender.com';
+let AUTH_TOKEN = localStorage.getItem('jwt_token') || null;
+
 
 function getAuthHeaders() {
     return {
-        'Authorization': `Bearer ${MOCK_ID_TOKEN}`,
+        'Authorization': `Bearer ${AUTH_TOKEN}`,
         'Content-Type': 'application/json'
     };
 }
+
+// ======================================================
+//  ✅ LÓGICA DE AUTENTICAÇÃO
+// ======================================================
+
+const authSection = document.getElementById('auth-section');
+const mainContainer = document.querySelector('.main-container');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const toggleRegisterBtn = document.getElementById('toggle-register-btn');
+const logoutBtn = document.getElementById('logout-btn');
+
+
+function updateUI(isLoggedIn) {
+    if (isLoggedIn) {
+        authSection.classList.add('hidden');
+        mainContainer.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        fetchAndRenderTasks();
+    } else {
+        authSection.classList.remove('hidden');
+        mainContainer.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+    }
+}
+
+async function handleAuth(url, email, password) {
+    try {
+        const res = await fetch(`${BASE_URL}${url}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            return alert(`Falha na autenticação: ${data.error || res.statusText}`);
+        }
+
+        // Armazena o token e atualiza o estado
+        AUTH_TOKEN = data.token;
+        localStorage.setItem('jwt_token', data.token);
+        updateUI(true);
+
+    } catch (err) {
+        console.error(err);
+        alert('Erro de conexão com o servidor de autenticação.');
+    }
+}
+
+// Troca entre Login e Registro
+if (toggleRegisterBtn) {
+    toggleRegisterBtn.addEventListener('click', () => {
+        loginForm.classList.toggle('hidden');
+        registerForm.classList.toggle('hidden');
+        toggleRegisterBtn.textContent = registerForm.classList.contains('hidden') ? 
+            "Ainda não tem conta? Clique para Criar Conta" : "Já tem conta? Clique para Entrar";
+    });
+}
+
+// Submissão do Login
+if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        handleAuth('/api/auth/login', email, password);
+    });
+}
+
+// Submissão do Registro
+if (registerForm) {
+    registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value.trim();
+        handleAuth('/api/auth/register', email, password);
+    });
+}
+
+// Logout
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        AUTH_TOKEN = null;
+        localStorage.removeItem('jwt_token');
+        updateUI(false);
+        alert('Logout realizado com sucesso.');
+    });
+}
+
+
+// Inicialização: Verifica se já existe um token
+updateUI(AUTH_TOKEN !== null);
+
+
+// ======================================================
+//  INÍCIO DO CÓDIGO ANTERIOR (MANTIDO)
+// ======================================================
+
 
 const cityInput = document.getElementById('city-input');
 const loadWeatherBtn = document.getElementById('load-weather-btn');
@@ -110,11 +206,16 @@ async function fetchAndRenderTasks(){
     const list = document.getElementById('task-list');
     list.innerHTML = '<li>Carregando tarefas...</li>';
     try {
+        // Usa o token real armazenado
         const res = await fetch(`${BASE_URL}/api/tasks`, { headers: getAuthHeaders() });
+        
+        // Se a resposta for 401 (Não Autorizado), faz o logout
         if (res.status === 401) {
-             list.innerHTML = '<li>Erro: Não autorizado. Simule o Login.</li>';
+             updateUI(false);
+             list.innerHTML = '<li>Sessão expirada. Faça login novamente.</li>';
              return;
         }
+
         tasks = await res.json();
         list.innerHTML = '';
         if (tasks.length === 0) {
@@ -245,7 +346,6 @@ async function checkWeatherAlert(task) {
     }
 }
 
-function escapeHtml(str){ return String(str).replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&#39;',"'":'&#39;'}[s]); }); }
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]); }); }
 
-// inicializa UI
-fetchAndRenderTasks();
+// Código de inicialização: a chamada fetchAndRenderTasks é feita dentro de updateUI
