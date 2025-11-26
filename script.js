@@ -1,4 +1,3 @@
-
 // Theme toggle (dark / light) - persists in localStorage
 const themeToggleBtn = document.getElementById('toggle-theme');
 function applyTheme() {
@@ -17,8 +16,39 @@ if (themeToggleBtn) {
 applyTheme();
 
 
-// script.js - Routine+ frontend (local development)
-const BASE_URL = 'http://localhost:3000';
+// === NOVO BLOCO: LÓGICA DO POP-UP DO CLIMA ===
+const weatherPopup = document.getElementById('weather-popup');
+const toggleWeatherBtn = document.getElementById('toggle-weather-btn');
+const closeWeatherBtn = document.getElementById('close-weather-btn');
+
+if (toggleWeatherBtn) {
+    toggleWeatherBtn.addEventListener('click', () => {
+        // Alterna a classe 'hidden' para mostrar/esconder
+        weatherPopup.classList.toggle('hidden'); 
+        
+        // Carrega o clima apenas se o painel estiver VISÍVEL
+        if (!weatherPopup.classList.contains('hidden')) {
+            loadWeather(currentCity); 
+        }
+    });
+}
+
+if (closeWeatherBtn) {
+    closeWeatherBtn.addEventListener('click', () => {
+        // Esconde o painel
+        weatherPopup.classList.add('hidden'); 
+    });
+}
+
+// Garante que o painel está escondido ao carregar a página
+if (weatherPopup) {
+    weatherPopup.classList.add('hidden');
+}
+// === FIM NOVO BLOCO ===
+
+
+// script.js - Routine+ frontend
+const BASE_URL = 'https://routine-plus.onrender.com'; // URL do Render
 let MOCK_ID_TOKEN = "TEST_TOKEN_XYZ_MOCK_USER_123";
 
 function getAuthHeaders() {
@@ -177,46 +207,44 @@ async function deleteTask(taskId){
     }
 }
 
+// LÓGICA DO ALERTA CLIMÁTICO REVISADA
 async function checkWeatherAlert(task) {
     try {
         const res = await fetch(`${BASE_URL}/api/weather/forecast?city=${encodeURIComponent(currentCity)}`);
-        if (!res.ok) return;
+        if (!res.ok) throw new Error("Forecast API error");
         const data = await res.json();
-        // OneCall-style response: check hourly[0] or daily
-        const main = (data.hourly?.[0]?.weather?.[0]?.main || data.current?.weather?.[0]?.main || '').toLowerCase();
-        if (main.includes('rain') || main.includes('storm') || main.includes('drizzle')) {
-            const taskDate = task.date ? new Date(task.date) : null;
-            if (!taskDate || (Math.abs(taskDate - new Date()) < 1000 * 60 * 60 * 24)) {
-                alert(`⚠️ Atenção! Pode chover na hora da tarefa "${task.title}" em ${data.name}!`);
+        
+        const now = new Date().getTime();
+        const next24Hours = now + (1000 * 60 * 60 * 24);
+        
+        let shouldAlert = false;
+        
+        if (data && data.list) {
+            for (const forecast of data.list) {
+                const forecastTime = forecast.dt * 1000;
+                
+                if (forecastTime > now && forecastTime <= next24Hours) {
+                     const weatherDesc = forecast.weather[0].main.toLowerCase();
+                     
+                     if (weatherDesc.includes('rain') || weatherDesc.includes('storm') || weatherDesc.includes('drizzle')) {
+                        shouldAlert = true;
+                        break;
+                     }
+                }
             }
         }
-    } catch(err){ console.error(err); }
+
+        if (shouldAlert) {
+            alert(`⚠️ ALERTA: Pode chover ou ter tempestade/garoa em ${data.city.name} nas próximas 24 horas. Sua tarefa "${task.title}" é "Ao ar livre"!`);
+        }
+
+    } catch(err) {
+        console.error("Erro ao verificar alerta climático:", err); 
+    }
 }
 
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]); }); }
 
 // inicializa UI
 fetchAndRenderTasks();
-loadWeather();
-
-
-
-// Simulate registering an FCM token for this user (for demo/dev)
-const registerTokenBtn = document.getElementById('register-token-btn');
-if (registerTokenBtn) {
-  registerTokenBtn.addEventListener('click', async () => {
-    const fakeToken = 'fcm_mock_token_' + Math.random().toString(36).slice(2,9);
-    try {
-      const res = await fetch(`${BASE_URL}/api/register-token`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ token: fakeToken })
-      });
-      if (!res.ok) throw new Error('Falha ao registrar token');
-      alert('Token FCM simulado registrado com sucesso (veja backend).');
-    } catch (e) {
-      console.error(e);
-      alert('Erro ao registrar token.');
-    }
-  });
-}
+// ❌ loadWeather() foi removido daqui e será chamado ao abrir o pop-up.

@@ -9,9 +9,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.OPENWEATHER_API_KEY;
 const MONGO_URI = process.env.MONGO_URI;
+const express = require('express');
+const fetch = require('node-fetch');
+const cors = require('cors');
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: '*', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+}));
 
 let db;
 let client;
@@ -82,16 +90,14 @@ app.get('/api/weather/forecast', async (req, res) => {
     }
 });
 
-// ======================================================
-//  📌 CRUD DE TAREFAS
-// ======================================================
+
 app.get('/api/tasks', async (req, res) => {
     try {
         if (!db) throw new Error("Database not initialized");
 
         const tasks = await db
             .collection("tasks")
-            .find({ userId: req.user.uid })
+            .find({ userId: req.user.uid, isCompleted: false }) 
             .toArray();
 
         res.json(tasks);

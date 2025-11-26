@@ -1,55 +1,76 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Routine+ — MVP Full-Stack (Tema Saúde)</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Routine+</title>
+    <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <header>
-    <h1>Routine+</h1>
-    <p>Organize suas tarefas com alertas climáticos inteligentes</p>
-    <div style="text-align:center; margin-top:8px;">
-    <button id="toggle-theme" class="small-btn" style="display:inline-block;">Alternar Dark Mode</button>
-  </div>
+  <header>
+    <h1>Routine+</h1>
+    <p>Organize suas tarefas com alertas climáticos inteligentes</p>
+    <div style="text-align:center; margin-top:8px;">
+        <button id="toggle-weather-btn" class="small-btn" style="display:inline-block; margin-right: 10px;">Ver Clima</button>
+        <button id="toggle-theme" class="small-btn" style="display:inline-block;">Alternar Dark Mode</button>
+    </div>
 </header>
 
-  <section id="weather">
-    <h2>Clima de Hoje</h2>
-    <div id="weather-controls">
-      <input type="text" id="city-input" placeholder="Digite sua cidade (ex: São Paulo)" value="Maceio" />
-      <button id="load-weather-btn">Atualizar Clima</button>
-    </div>
-    <div id="weather-info">Carregando clima...</div>
-  </section>
+<aside id="weather-popup" class="hidden">
+    <button id="close-weather-btn" class="small-btn">X</button>
+    <section id="weather">
+        <h2>Clima de Hoje</h2>
+        <div id="weather-controls">
+          <input type="text" id="city-input" placeholder="Digite sua cidade (ex: Maceio)" value="Maceio" />
+          <button id="load-weather-btn">Atualizar Clima</button>
+        </div>
+        <div id="weather-info">Carregando clima...</div>
+    </section>
+</aside>
 
-  <section id="task-form-section">
-    <h2>Criar Tarefa</h2>
-    <form id="task-form">
-      <input type="text" id="title" placeholder="Título da tarefa" required />
-      <input type="datetime-local" id="date" />
-      <select id="category">
-        <option value="Casa">Casa</option>
-        <option value="Trabalho">Trabalho</option>
-        <option value="Estudos">Estudos</option>
-        <option value="Ao ar livre">Ao ar livre</option>
-      </select>
-      <textarea id="description" placeholder="Descrição (opcional)"></textarea>
-      <button type="submit">Adicionar Tarefa</button>
-    </form>
-    <div style="margin-top:8px;"><button id="register-token-btn" class="small-btn">Registrar token FCM (simulado)</button></div>
-  </section>
+  <div class="main-container">
 
-  <section id="task-list-section">
-    <h2>Minhas Tarefas</h2>
-    <ul id="task-list"></ul>
-  </section>
+    <aside id="sidebar">
+      <h2>Filtros</h2>
+      <nav id="filter-nav">
+        <button class="filter-btn active" data-filter="all">Todas as Tarefas</button>
+        <button class="filter-btn" data-filter="Casa">Casa</button>
+        <button class="filter-btn" data-filter="Trabalho">Trabalho</button>
+        <button class="filter-btn" data-filter="Estudos">Estudos</button>
+        <button class="filter-btn" data-filter="Ao ar livre">Ao ar livre</option>
+      </nav>
+    </aside>
 
-  <footer>
-    Routine+ — Desenvolvido como MVP Full-Stack para portfólio
-  </footer>
+    <main id="main-content">
 
-  <script src="script.js"></script>
+              <section id="task-list-section">
+        <h2>Minhas Tarefas</h2>
+        <ul id="task-list"></ul>
+      </section>
+
+              <section id="task-form-section">
+        <h2>Criar Tarefa</h2>
+        <form id="task-form">
+          <input type="text" id="title" placeholder="Título da tarefa" required />
+          <input type="datetime-local" id="date" />
+          <select id="category">
+            <option value="Casa">Casa</option>
+            <option value="Trabalho">Trabalho</option>
+            <option value="Estudos">Estudos</option>
+            <option value="Ao ar livre">Ao ar livre</option>
+          </select>
+          <textarea id="description" placeholder="Descrição (opcional)"></textarea>
+          <button type="submit">Adicionar Tarefa</button>
+        </form>
+      </section>
+    </main>
+
+  </div>
+
+  <footer>
+    Routine+ — Desenvolvido como MVP Full-Stack para portfólio
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
